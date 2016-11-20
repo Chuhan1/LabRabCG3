@@ -1,0 +1,241 @@
+<HTML>
+<BODY>
+<p>Lab3 Krivie Besie</p>
+
+<canvas id="lab03" height="600" width="600"> 
+<script> 
+
+
+
+	class Point 
+        { 
+            constructor(x, y) 
+             { 
+                this.x = x; 
+                this.y = y; 
+             } 
+        } 
+
+
+
+
+
+
+	function createLine(context, x0, y0, x1, y1) 
+         { 
+             var deltax1 = Math.abs(x1 - x0); 
+             var deltay1 = Math.abs(y1 - y0); 
+             var paramNakl; 
+ 
+             if(deltax1 >= deltay1) 
+             { 
+                paramNakl = 1; 
+             } 
+             else 
+             { 
+                paramNakl = 0; 
+             } 
+ 
+            var deltax2; 
+            var deltay2; 
+            var X0; 
+            var Y0;  
+            var dy = 1; 
+ 
+            if(paramNakl) 
+            { 
+                 deltax2 = deltax1; 
+                 deltay2 = deltay1; 
+  
+                 if(x0 <= x1) 
+                 { 
+                     X0 = x0; 
+                     Y0 = y0; 
+  
+                     if((y1 - y0) < 0) 
+                     { 
+                         dy = -1; 
+                     } 
+                 } 
+                 else 
+                 { 
+                    X0 = x1; 
+                    Y0 = y1; 
+ 
+                    if((y1 - y0) > 0) 
+                    { 
+                        dy = -1; 
+                    } 
+                 } 
+             } 
+             else 
+             { 
+                 deltax2 = deltay1; 
+                 deltay2 = deltax1; 
+ 
+                 if(y0 <= y1) 
+                 {                      
+	             X0 = x0; 
+                     Y0 = y0; 
+ 
+                     if((x1 - x0) < 0) 
+                     { 
+                         dy = -1; 
+                     } 
+                  } 
+                  else 
+                  { 
+                     X0 = x1; 
+                    Y0 = y1; 
+ 
+                     if((x1 - x0) > 0) 
+                     { 
+                         dy = -1; 
+                     } 
+                  } 
+             } 
+  
+             var d = 2 * deltay2 - deltax2; 
+             var y = 0; 
+  
+             for(i = 0; i < deltax2; i++) 
+             { 
+                 if(d >= 0) 
+                 { 
+                     y += dy; 
+                     d += 2 * (deltay2 - deltax2); 
+		 } 
+		 else 
+                 { 
+                     d += 2 * deltay2; 
+                 } 
+  
+                 if(paramNakl) 
+                 {  
+		     context.fillRect(i + X0, y + Y0, 1, 1);
+                 } 
+                 else 
+                 {                     
+		     context.fillRect(y + X0, i + Y0, 1, 1);
+                 } 
+             } 
+             } 
+
+
+
+
+
+
+
+
+
+	function createCurve(context, points) 
+         { 
+             var points1 = []; 
+  
+             var points2 = []; 
+  
+             var points3 = []; 
+  
+            for(var i = 0; i < points.length - 1; i++) 
+             { 
+                 let point1 = new Point((points[i].x + points[i + 1].x) / 2, (points[i].y + points[i + 1].y) / 2); 
+  
+                 points3.push(point1); 
+             } 
+  
+             let point2 = new Point((points[0].x + 2 * points[1].x + points[2].x) / 4, (points[0].y + 2 * points[1].y + points[2].y) / 4); 
+  
+             points1.push(points[0]); 
+  
+             points1.push(points3[0]); 
+  
+             points1.push(point2); 
+  
+             points2.push(point2); 
+  
+             points2.push(points3[1]); 
+  
+             points2.push(points[2]); 
+  
+             var deltax1 = point2.x - points[0].x; 
+  
+             var deltay1 = point2.y - points[0].y; 
+  
+             if(deltay1 / deltax1 * (points3[0].x - points[0].x) + points[0].y - points3[0].y >= 1) 
+             { 
+                 createCurve(context, points1); 
+             } 
+             else 
+             { 
+                 createLine(context, points[0].x, points[0].y, point2.x, point2.y); 
+             } 
+             
+             var deltax2 = points[2].x - point2.x; 
+  
+             var deltay2 = points[2].y - point2.y; 
+ 
+             if(deltay2 / deltax2 * (points3[1].x - points[2].x) + points[2].y - points3[1].y >= 1) 
+             { 
+                 createCurve(context, points2); 
+             } 
+             else 
+             { 
+                 createLine(context, points[2].x, points[2].y, point2.x, point2.y); 
+             } 
+         } 
+
+
+
+
+
+
+
+
+
+
+             var canvas = document.getElementById("lab03");               
+             var context = canvas.getContext("2d"); 
+  
+             var points = []; 
+ 
+             var pcount = 0; 
+  
+  
+            function onClick() 
+             { 
+                 if(event.which == 1) 
+                 { 
+                     var x = event.offsetX; 
+                     var y = event.offsetY; 
+                    
+  		     let point = new Point(x,y);
+			
+		     points.push(point);
+                     
+                     pcount++; 
+  
+                     if(pcount>1)
+		     {
+
+			createLine(context, points[pcount-1].x , points[pcount-1].y ,points[pcount-2].x , points[pcount-2].y );
+	             }
+  
+                     context.fillRect(x, y, 1, 1);
+                 } 
+ 
+                 if(event.which == 2) 
+                 { 
+     		    
+
+                    createCurve(context, points);
+                    points =[]; 
+		    pcount =0;
+                 } 
+            } 
+  
+canvas.addEventListener("click", onClick);
+</script>
+</canvas>
+</BODY>
+</HTML>
